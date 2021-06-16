@@ -14,47 +14,38 @@ const mapContainerStyle = {
 
 const center = {
   lat: 37.5247596,
-  lng: -122.2583719,
+  lng: -122.2583719
 };
 
-const street = {
-  lat: 51.5320665,
-  lng: -0.177203,
-};
-
-type MapProps = {
+type StreetMapProps = {
   googleMapsApiKey: string;
 };
 
-export default function Map({ googleMapsApiKey }: MapProps) {
-  const [position, setPosition] = useState({
-    lat: 37.772,
-    lng: -122.214,
-  });
-
-  const handleMapClick = (e: any) => {
-    const { latLng } = e;
-
-    setPosition({
-      lat: latLng.lat(),
-      lng: latLng.lng(),
-    });
-  };
-
+export default function StreetMap({ googleMapsApiKey }: StreetMapProps) {
   return (
     <LoadScript googleMapsApiKey={googleMapsApiKey}>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={center}
         zoom={2}
-        onClick={handleMapClick}
         clickableIcons={false}
         options={{
           clickableIcons: false,
           disableDefaultUI: true,
         }}
       >
-        <Marker position={position} />
+        <StreetViewPanorama
+          options={{
+            position: center,
+            enableCloseButton: false,
+            linksControl: false,
+            addressControl: false,
+            visible: true,
+            motionTracking: true,
+            motionTrackingControl: true,
+            disableDefaultUI: true,
+          }}
+        />
       </GoogleMap>
     </LoadScript>
   );

@@ -1,6 +1,7 @@
 import React from "react";
 import { useSession, signIn, signOut } from "next-auth/client";
 import Map from "../components/map";
+import StreetMap from "../components/streetmap";
 import { GetStaticProps } from "next";
 
 export function Login() {
@@ -31,6 +32,7 @@ export default function Home({ googleMapsApiKey }: HomeProps) {
     <>
       <Login />
       <Map googleMapsApiKey={googleMapsApiKey} />
+      <StreetMap googleMapsApiKey={googleMapsApiKey} />
     </>
   );
 }
