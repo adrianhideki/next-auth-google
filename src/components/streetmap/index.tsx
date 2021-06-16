@@ -41,9 +41,10 @@ export default function StreetMap({ googleMapsApiKey }: StreetMapProps) {
             linksControl: false,
             addressControl: false,
             visible: true,
-            motionTracking: true,
-            motionTrackingControl: true,
+            motionTracking: false,
+            motionTrackingControl: false,
             disableDefaultUI: true,
+            showRoadLabels: false,
           }}
         />
       </GoogleMap>
