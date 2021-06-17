@@ -6,6 +6,8 @@ import { GetStaticProps } from "next";
 
 export function Login() {
   const [session, loading] = useSession();
+  
+  console.log(session);
 
   if (session) {
     return (
