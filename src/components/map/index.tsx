@@ -1,29 +1,24 @@
 import React, { Component, useEffect, useState } from "react";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  DistanceMatrixService,
-  useJsApiLoader,
-  LoadScriptNext,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, LoadScriptNext } from "@react-google-maps/api";
 import { GetStaticProps } from "next";
 import axios from "axios";
+import {
+  getDistanceInMeters,
+  getRandomNearLocation,
+  getRandomStartPoint,
+  getRandomStreetView,
+} from "../../services/map";
+import { useGameContext } from "../../context/gameContext";
 
 const mapContainerStyle = {
   height: "400px",
   width: "800px",
 };
 
-const center = {
-  lat: 37.5247596,
-  lng: -122.2583719,
-};
+const initialPosition = getRandomStartPoint();
 
-const street = {
-  lat: 51.5320665,
-  lng: -0.177203,
-};
+const MAX_DISTANCE_GOAL = 100;
+const MAX_DISTANCE_START = 800;
 
 type MapProps = {
   googleMapsApiKey: string;
@@ -32,51 +27,41 @@ type MapProps = {
 type Position = {
   lat: number;
   lng: number;
-  visible: boolean;
 };
 
 export default function Map({ googleMapsApiKey }: MapProps) {
-  const google = useJsApiLoader({
-    googleMapsApiKey: googleMapsApiKey,
-  });
-
-  const [position, setPosition] = useState({
-    ...center,
-    visible: false,
-  } as Position);
+  const {
+    setupGame,
+    sendGuessPoint,
+    startPoint,
+    goalPoint,
+    distance,
+    guessPoint,
+  } = useGameContext();
 
   const handleMapClick = (e: any) => {
     const { latLng } = e;
-    console.log({
-      lat: latLng.lat(),
-      lng: latLng.lng(),
-    });
 
-    setPosition({
-      lat: latLng.lat(),
-      lng: latLng.lng(),
-      visible: true,
-    });
+    const destination = {
+      lat: latLng.lat() as number,
+      lng: latLng.lng() as number,
+    };
+
+    sendGuessPoint(destination);
+  };
+
+  const handleMapLoad = (maker: google.maps.Marker) => {
+    setupGame();
   };
 
   return (
     <>
-      {/* <LoadScriptNext googleMapsApiKey={googleMapsApiKey}> */}
-      {/* <DistanceMatrixService
-          options={{
-            destinations: [{ lat: 1.296788, lng: 103.778961 }],
-            origins: [{ lng: 103.780267, lat: 1.291692 }],
-          }}
-          callback={(response) => {
-            console.log(response);
-          }}
-        /> */}
-      {/* </LoadScriptNext> */}
+      <strong>{distance}</strong>
       <LoadScriptNext googleMapsApiKey={googleMapsApiKey}>
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          center={center}
-          zoom={2}
+          center={startPoint}
+          zoom={15}
           onClick={handleMapClick}
           clickableIcons={false}
           options={{
@@ -84,7 +69,8 @@ export default function Map({ googleMapsApiKey }: MapProps) {
             disableDefaultUI: true,
           }}
         >
-          <Marker position={position} visible={position.visible} />
+          <Marker position={goalPoint} onLoad={handleMapLoad} />
+          <Marker position={guessPoint} />
         </GoogleMap>
       </LoadScriptNext>
     </>

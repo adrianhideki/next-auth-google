@@ -11,18 +11,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(401).end("Unauthorized");
   }
   else if (req.method === "GET") {
-    // pass origins=40.6655101,-73.89188969999998&destinations=40.6905615,-73.9976592 as parameter
-    const origin = (req.query.origin as string);
-    const destination = (req.query.destination as string);
+    const points = (req.query.point as string).split(',');
 
-    if (origin.length === 0 || destination.length === 0) {
+    if (points.length !== 2) {
       res.status(400).end("Invalid parameters");
     }
 
     const result = await axios
     .get(
-      `https://maps.googleapis.com/maps/api/directions/json?units=metric&origin=place_id:${origin}&destination=place_id:${destination}&key=${process.env.GOOGLE_MAPS_API_KEY}`,
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${points[0]},${points[1]}&key=${process.env.GOOGLE_MAPS_API_KEY}`,
     );
+
 
     if (!result) {
       return res.status(404).end("Not found");

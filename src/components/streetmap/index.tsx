@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import {
   GoogleMap,
   LoadScript,
@@ -6,15 +6,11 @@ import {
   StreetViewPanorama,
 } from "@react-google-maps/api";
 import { GetStaticProps } from "next";
+import { useGameContext } from "../../context/gameContext";
 
 const mapContainerStyle = {
   height: "400px",
   width: "800px",
-};
-
-const center = {
-  lat: 37.5247596,
-  lng: -122.2583719
 };
 
 type StreetMapProps = {
@@ -22,32 +18,61 @@ type StreetMapProps = {
 };
 
 export default function StreetMap({ googleMapsApiKey }: StreetMapProps) {
+  const { startPoint, setStreetPoint, hasStart, guessPoint, streetPoint } = useGameContext();
+  const ref = React.useRef<StreetViewPanorama>();
+
   return (
     <LoadScript googleMapsApiKey={googleMapsApiKey}>
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={center}
-        zoom={2}
-        clickableIcons={false}
-        options={{
-          clickableIcons: false,
-          disableDefaultUI: true,
-        }}
-      >
-        <StreetViewPanorama
+      {startPoint.lat && (
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={startPoint}
+          zoom={2}
+          clickableIcons={false}
           options={{
-            position: center,
-            enableCloseButton: false,
-            linksControl: false,
-            addressControl: false,
-            visible: true,
-            motionTracking: false,
-            motionTrackingControl: false,
+            clickableIcons: false,
             disableDefaultUI: true,
-            showRoadLabels: false,
           }}
-        />
-      </GoogleMap>
+          onClick={(e) => console.log(e)}
+        >
+          <StreetViewPanorama
+            options={{
+              position: startPoint,
+              enableCloseButton: false,
+              linksControl: false,
+              addressControl: false,
+              visible: true,
+              motionTracking: false,
+              motionTrackingControl: false,
+              disableDefaultUI: true,
+              showRoadLabels: false,
+            }}
+            ref={ref}
+            onPositionChanged={() => {
+              if (ref.current?.context.data.map.streetView.location) {
+                var lat =
+                  ref.current?.context.data.map.streetView.location.latLng.lat();
+                var lng =
+                  ref.current?.context.data.map.streetView.location.latLng.lng();
+
+                // console.log(lat, lng, hasStart, streetPoint);
+                if (
+                  lat &&
+                  lng &&
+                  hasStart &&
+                  streetPoint.lat !== lat &&
+                  streetPoint.lng !== lng
+                ) {
+                  // setStreetPoint({
+                  //   lat: lat,
+                  //   lng: lng,
+                  // });
+                }
+              }
+            }}
+          />
+        </GoogleMap>
+      )}
     </LoadScript>
   );
 }

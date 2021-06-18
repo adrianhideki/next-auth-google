@@ -3,11 +3,12 @@ import { useSession, signIn, signOut } from "next-auth/client";
 import Map from "../components/map";
 import StreetMap from "../components/streetmap";
 import { GetStaticProps } from "next";
+import { GameProvider } from "../context/gameContext";
 
 export function Login() {
   const [session, loading] = useSession();
-  
-  console.log(session);
+
+  // console.log(session);
 
   if (session) {
     return (
@@ -31,11 +32,13 @@ type HomeProps = {
 
 export default function Home({ googleMapsApiKey }: HomeProps) {
   return (
-    <>
-      <Login />
-      <Map googleMapsApiKey={googleMapsApiKey} />
-      <StreetMap googleMapsApiKey={googleMapsApiKey} />
-    </>
+    <GameProvider>
+      <>
+        <Login />
+        <Map googleMapsApiKey={googleMapsApiKey} />
+        <StreetMap googleMapsApiKey={googleMapsApiKey} />
+      </>
+    </GameProvider>
   );
 }
 
